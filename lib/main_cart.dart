@@ -137,9 +137,32 @@ class _CartScreenState extends State<CartScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-          IconButton(
+          PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
+            onSelected: (value) {
+              if (value == 'Settings') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SettingsPage()),
+                );
+              } else if (value == 'Help') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const HelpPage()),
+                );
+              }
+            },
+            itemBuilder:
+                (BuildContext context) => [
+                  const PopupMenuItem<String>(
+                    value: 'Settings',
+                    child: Text('Settings'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'Help',
+                    child: Text('Help'),
+                  ),
+                ],
           ),
         ],
       ),
@@ -355,6 +378,30 @@ class _CartScreenState extends State<CartScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+// Dummy settings page
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Settings")),
+      body: const Center(child: Text("Settings Page")),
+    );
+  }
+}
+
+// Dummy help page
+class HelpPage extends StatelessWidget {
+  const HelpPage({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Help")),
+      body: const Center(child: Text("Help Page")),
     );
   }
 }

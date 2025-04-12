@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(debugShowCheckedModeBanner: false, home: OrdersPage());
@@ -30,6 +32,8 @@ class OrdersPage extends StatelessWidget {
       'image': 'assets/Hoodie.png',
     },
   ];
+
+  OrdersPage({super.key});
 
   @override
   Widget build(BuildContext context) {
