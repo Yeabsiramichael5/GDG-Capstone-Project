@@ -21,6 +21,10 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   String selectedPaymentMethod = 'Credit Card';
   final Color customBlue = Color(0xFF2A3F78);
+  String location = '325 15th Eighth Avenue, NewYork';
+  String deliveryTime = '6:00 pm, Wednesday 20';
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController timeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -57,46 +61,66 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ],
                   ),
                   SizedBox(height: 30),
-                  Row(
-                    children: [
-                      Icon(Icons.location_pin, color: customBlue),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '325 15th Eighth Avenue, NewYork',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
+                  GestureDetector(
+                    onTap: () async {
+                      String? newLocation = await _showLocationDialog();
+                      if (newLocation != null && newLocation.isNotEmpty) {
+                        setState(() {
+                          location = newLocation;
+                        });
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.location_pin, color: customBlue),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                location,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            Text(
-                              'Saepe eaque fugiat ea voluptatum veniam.',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
+                              Text(
+                                'Saepe eaque fugiat ea voluptatum veniam.',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Icon(Icons.access_time, color: customBlue),
-                      SizedBox(width: 10),
-                      Text(
-                        '6:00 pm, Wednesday 20',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
+                  GestureDetector(
+                    onTap: () async {
+                      String? newTime = await _showTimeDialog();
+                      if (newTime != null && newTime.isNotEmpty) {
+                        setState(() {
+                          deliveryTime = newTime;
+                        });
+                      }
+                    },
+                    child: Row(
+                      children: [
+                        Icon(Icons.access_time, color: customBlue),
+                        SizedBox(width: 10),
+                        Text(
+                          deliveryTime,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   SizedBox(height: 30),
                   Container(
@@ -150,14 +174,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      _showAddPaymentMethodDialog();
+                    },
                   ),
                   Spacer(),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // API call or navigation here
+                        print("Proceeding with checkout...");
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: customBlue,
@@ -222,6 +248,195 @@ class _CheckoutPageState extends State<CheckoutPage> {
         setState(() {
           selectedPaymentMethod = title;
         });
+        if (title != 'Cash') {
+          _showPaymentMethodDialog(title);
+        }
+      },
+    );
+  }
+
+  Future<String?> _showLocationDialog() async {
+    locationController.text = location;
+    return showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Enter your location'),
+          content: TextField(
+            controller: locationController,
+            decoration: InputDecoration(hintText: 'Enter new location'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(locationController.text);
+              },
+              child: Text('Done'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<String?> _showTimeDialog() async {
+    timeController.text = deliveryTime;
+    return showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Enter delivery time'),
+          content: TextField(
+            controller: timeController,
+            decoration: InputDecoration(hintText: 'Enter new time'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(timeController.text);
+              },
+              child: Text('Done'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPaymentMethodDialog(String method) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Enter your $method details'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(decoration: InputDecoration(hintText: 'Name')),
+              TextField(
+                decoration: InputDecoration(hintText: 'Account number'),
+              ),
+              TextField(
+                obscureText: true,
+                decoration: InputDecoration(hintText: 'Password'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  selectedPaymentMethod = method;
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddPaymentMethodDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Select payment method'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                title: Text('Digital Wallets'),
+                onTap: () => _showPaymentDetailsDialog('Digital Wallets'),
+              ),
+              ListTile(
+                title: Text('Bank Transfer'),
+                onTap: () => _showPaymentDetailsDialog('Bank Transfer'),
+              ),
+              ListTile(
+                title: Text('Cryptocurrency'),
+                onTap: () => _showPaymentDetailsDialog('Cryptocurrency'),
+              ),
+              ListTile(
+                title: Text('BNPL (Buy Now, Pay Later)'),
+                onTap: () => _showPaymentDetailsDialog('BNPL'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Done'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPaymentDetailsDialog(String method) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Enter your $method details'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(decoration: InputDecoration(hintText: 'Name')),
+              TextField(
+                decoration: InputDecoration(hintText: 'Account number'),
+              ),
+              TextField(
+                obscureText: true,
+                decoration: InputDecoration(hintText: 'Password'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Confirm'),
+            ),
+          ],
+        );
       },
     );
   }

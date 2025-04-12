@@ -11,29 +11,46 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class OrdersPage extends StatelessWidget {
-  final List<Map<String, String>> orders = [
+class OrdersPage extends StatefulWidget {
+  const OrdersPage({super.key});
+
+  @override
+  _OrdersPageState createState() => _OrdersPageState();
+}
+
+class _OrdersPageState extends State<OrdersPage> {
+  // Initialize orders with different statuses
+  final List<Map<String, dynamic>> orders = [
     {
       'title': 'Watch',
       'brand': 'Rolex',
       'price': '\$40',
       'image': 'assets/Watch.png',
+      'status': 'Active',
     },
     {
       'title': 'Airpods',
       'brand': 'Apple',
       'price': '\$333',
       'image': 'assets/Airpods.png',
+      'status': 'Active',
     },
     {
       'title': 'Hoodie',
       'brand': 'Puma',
       'price': '\$50',
       'image': 'assets/Hoodie.png',
+      'status': 'Completed',
     },
   ];
 
-  OrdersPage({super.key});
+  // Track selected tab
+  String _selectedTab = 'Active';
+
+  // Method to filter orders by status
+  List<Map<String, dynamic>> getFilteredOrders(String status) {
+    return orders.where((order) => order['status'] == status).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,17 +75,20 @@ class OrdersPage extends StatelessWidget {
                         child: GestureDetector(
                           onTap: () => Navigator.of(context).pop(),
                           child: Container(
-                            padding: EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.grey[200],
                             ),
-                            child: Icon(Icons.arrow_back, color: Colors.black),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    Text(
+                    const Text(
                       'Orders',
                       style: TextStyle(
                         fontSize: 20,
@@ -85,9 +105,9 @@ class OrdersPage extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildTab('Active', true),
-                      _buildTab('Completed', false),
-                      _buildTab('Cancel', false),
+                      _buildTab('Active', _selectedTab == 'Active'),
+                      _buildTab('Completed', _selectedTab == 'Completed'),
+                      _buildTab('Canceled', _selectedTab == 'Canceled'),
                     ],
                   ),
                 ),
@@ -97,9 +117,12 @@ class OrdersPage extends StatelessWidget {
                       horizontal: 16.0,
                       vertical: 8.0,
                     ),
-                    itemCount: orders.length,
+                    itemCount: getFilteredOrders(_selectedTab).length,
                     itemBuilder: (context, index) {
-                      return _buildOrderCard(orders[index], constraints);
+                      return _buildOrderCard(
+                        getFilteredOrders(_selectedTab)[index],
+                        constraints,
+                      );
                     },
                   ),
                 ),
@@ -114,12 +137,19 @@ class OrdersPage extends StatelessWidget {
   Widget _buildTab(String title, bool isSelected) {
     return Column(
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: isSelected ? Colors.black : Colors.grey,
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _selectedTab = title;
+            });
+          },
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: isSelected ? Colors.black : Colors.grey,
+            ),
           ),
         ),
         if (isSelected)
@@ -134,14 +164,14 @@ class OrdersPage extends StatelessWidget {
   }
 
   Widget _buildOrderCard(
-    Map<String, String> order,
+    Map<String, dynamic> order,
     BoxConstraints constraints,
   ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Color(0xFFF6F6F6),
+        color: const Color(0xFFF6F6F6),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -155,7 +185,7 @@ class OrdersPage extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,14 +193,20 @@ class OrdersPage extends StatelessWidget {
               children: [
                 Text(
                   order['title']!,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                SizedBox(height: 4),
-                Text(order['brand']!, style: TextStyle(color: Colors.grey)),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
+                Text(
+                  order['brand']!,
+                  style: const TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 4),
                 Text(
                   order['price']!,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.deepPurple,
                     fontWeight: FontWeight.bold,
                   ),
@@ -178,21 +214,57 @@ class OrdersPage extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF6C63FF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          const SizedBox(width: 8),
+          if (_selectedTab == 'Active')
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      order['status'] = 'Canceled'; // Move to canceled
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6C63FF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                  ),
+                  child: const Text(
+                    'Cancel Order',
+                    style: TextStyle(fontSize: 12, color: Colors.white),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    // Track order action can go here
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6C63FF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                  ),
+                  child: const Text(
+                    'Track Order',
+                    style: TextStyle(fontSize: 12, color: Colors.white),
+                  ),
+                ),
+              ],
             ),
-            child: Text(
-              'Track Order',
-              style: TextStyle(fontSize: 12, color: Colors.white),
-            ),
-          ),
+          if (_selectedTab == 'Completed')
+            const SizedBox.shrink(), // No button for completed
+          if (_selectedTab == 'Canceled')
+            const SizedBox.shrink(), // No button for canceled
         ],
       ),
     );

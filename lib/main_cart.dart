@@ -130,9 +130,16 @@ class _CartScreenState extends State<CartScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).maybePop(),
+          onPressed:
+              () => Navigator.of(context).pop(), // Make back button functional
         ),
-        title: const Text('Cart', style: TextStyle(color: Colors.black)),
+        title: const Text(
+          'Cart',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ), // Make the Cart text bold
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
