@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'settings_page.dart'; // Make sure this file exists
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -24,63 +25,70 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Profile image
+              // Profile Image
               Center(
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: AssetImage("assets/profile.jpg"), // <-- Add your image here
+                  backgroundImage: AssetImage("assets/profile.jpg"),
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                "Mark Adam",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              const Center(
+                child: Text(
+                  "Mark Adam",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                "Sunny_Koelpin45@hotmail.com",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+              const Center(
+                child: Text(
+                  "Sunny_Koelpin45@hotmail.com",
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
               ),
               const SizedBox(height: 30),
 
-              // Pressable menu items
+              // Menu Items with Buttons
               buildMenuItem(Icons.person, "Profile", () {
-                // TODO: Navigate or handle action
-                print("Profile tapped");
+                // Do something on Profile
               }),
               buildMenuItem(Icons.settings, "Setting", () {
-                print("Setting tapped");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                );
               }),
               buildMenuItem(Icons.mail, "Contact", () {
-                print("Contact tapped");
+                // Do something on Contact
               }),
               buildMenuItem(Icons.share, "Share App", () {
-                print("Share App tapped");
+                // Do something on Share
               }),
               buildMenuItem(Icons.help_outline, "Help", () {
-                print("Help tapped");
+                // Do something on Help
               }),
 
               const SizedBox(height: 30),
 
-              // Sign Out
+              // Sign Out Button
               Center(
-                child: TextButton(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                   onPressed: () {
-                    print("Sign Out tapped");
+                    // Handle sign out
                   },
                   child: const Text(
                     "Sign Out",
-                    style: TextStyle(
-                      color: Colors.deepOrange,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
-              ),
+              )
             ],
           ),
         ),
@@ -88,20 +96,20 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget buildMenuItem(IconData icon, String title, VoidCallback onPressed) {
+  Widget buildMenuItem(IconData icon, String title, VoidCallback onTap) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       child: ElevatedButton(
-        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-          backgroundColor: const Color(0xFFF5F5F5),
           foregroundColor: Colors.black,
+          backgroundColor: const Color(0xFFF5F5F5),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
+          elevation: 0,
         ),
+        onPressed: onTap,
         child: Row(
           children: [
             Icon(icon, size: 22),
