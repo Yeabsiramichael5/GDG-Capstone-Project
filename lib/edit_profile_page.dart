@@ -1,4 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'services/api_service.dart';
+
+
+
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -9,7 +15,14 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
+  final int userId = 1; // Replace this with the actual logged-in user ID
 
+  // User fields
+  String firstName = 'Mark';
+  String lastName = 'Adam';
+  String username = '@Mark';
+  String email = 'Sunny_Koelpin45@hotmail.com';
+  String phone = '+234 904 6470';
   String selectedGender = 'Female';
   String selectedBirthYear = '1998';
 
@@ -17,6 +30,41 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final List<String> birthYears = [
     for (int i = 1960; i <= 2023; i++) i.toString()
   ];
+
+  Future<void> updateUserProfile() async {
+    final updatedData = {
+      'email': email,
+      'username': username,
+      'name': {
+        'firstname': firstName,
+        'lastname': lastName,
+      },
+      'phone': phone,
+    };
+
+    final url = Uri.parse('https://fakestoreapi.com/users/$userId');
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(updatedData),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Profile updated successfully")),
+        );
+        print("Response: ${response.body}");
+      } else {
+        throw Exception("Failed to update: ${response.statusCode}");
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,18 +142,38 @@ class _EditProfilePageState extends State<EditProfilePage> {
               key: _formKey,
               child: Column(
                 children: [
-                  buildTextField(label: 'First Name', initialValue: 'Mark '),
-                  buildTextField(label: 'Last Name', initialValue: 'Adam'),
-                  buildTextField(label: 'Username', initialValue: '@Mark'),
-                  buildTextField(label: 'Email', initialValue: 'Sunny_Koelpin45@hotmail.com'),
-                  buildTextField(label: 'Phone Number', initialValue: '+234 904 6470'),
+                  buildTextField(
+                    label: 'First Name',
+                    initialValue: firstName,
+                    onChanged: (val) => firstName = val,
+                  ),
+                  buildTextField(
+                    label: 'Last Name',
+                    initialValue: lastName,
+                    onChanged: (val) => lastName = val,
+                  ),
+                  buildTextField(
+                    label: 'Username',
+                    initialValue: username,
+                    onChanged: (val) => username = val,
+                  ),
+                  buildTextField(
+                    label: 'Email',
+                    initialValue: email,
+                    onChanged: (val) => email = val,
+                  ),
+                  buildTextField(
+                    label: 'Phone Number',
+                    initialValue: phone,
+                    onChanged: (val) => phone = val,
+                  ),
                   const SizedBox(height: 16),
-                  buildDropdown('Birth', selectedBirthYear, birthYears, (value) {
-                    setState(() => selectedBirthYear = value!);
+                  buildDropdown('Birth', selectedBirthYear, birthYears, (val) {
+                    setState(() => selectedBirthYear = val!);
                   }),
                   const SizedBox(height: 16),
-                  buildDropdown('Gender', selectedGender, genders, (value) {
-                    setState(() => selectedGender = value!);
+                  buildDropdown('Gender', selectedGender, genders, (val) {
+                    setState(() => selectedGender = val!);
                   }),
                   const SizedBox(height: 30),
                   ElevatedButton.icon(
@@ -122,7 +190,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       style: TextStyle(color: Colors.white),
                     ),
                     onPressed: () {
-                      // Handle password change action
+                      updateUserProfile();
                     },
                   ),
                   const SizedBox(height: 40),
@@ -135,11 +203,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget buildTextField({required String label, required String initialValue}) {
+  Widget buildTextField({
+    required String label,
+    required String initialValue,
+    required ValueChanged<String> onChanged,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextFormField(
         initialValue: initialValue,
+        onChanged: onChanged,
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -148,7 +221,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  Widget buildDropdown(String label, String value, List<String> items, ValueChanged<String?> onChanged) {
+  Widget buildDropdown(
+      String label, String value, List<String> items, ValueChanged<String?> onChanged) {
     return Row(
       children: [
         Expanded(
