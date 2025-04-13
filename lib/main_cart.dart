@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'main_check_out.dart'; // Added for navigation
 
 void main() {
   runApp(const MyApp());
@@ -130,15 +131,11 @@ class _CartScreenState extends State<CartScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed:
-              () => Navigator.of(context).pop(), // Make back button functional
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Cart',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ), // Make the Cart text bold
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -362,8 +359,11 @@ class _CartScreenState extends State<CartScreen> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Check Out clicked')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CheckoutPage(),
+                  ), // NEW
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -389,7 +389,6 @@ class _CartScreenState extends State<CartScreen> {
   }
 }
 
-// Dummy settings page
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
   @override
@@ -401,7 +400,6 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-// Dummy help page
 class HelpPage extends StatelessWidget {
   const HelpPage({super.key});
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'main_cart.dart'; // Added for navigation back to Cart
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -19,7 +20,6 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
-  // Initialize orders with different statuses
   final List<Map<String, dynamic>> orders = [
     {
       'title': 'Watch',
@@ -44,10 +44,8 @@ class _OrdersPageState extends State<OrdersPage> {
     },
   ];
 
-  // Track selected tab
   String _selectedTab = 'Active';
 
-  // Method to filter orders by status
   List<Map<String, dynamic>> getFilteredOrders(String status) {
     return orders.where((order) => order['status'] == status).toList();
   }
@@ -73,7 +71,13 @@ class _OrdersPageState extends State<OrdersPage> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: GestureDetector(
-                          onTap: () => Navigator.of(context).pop(),
+                          onTap:
+                              () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const CartScreen(),
+                                ), // NEW
+                              ),
                           child: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
@@ -221,7 +225,7 @@ class _OrdersPageState extends State<OrdersPage> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      order['status'] = 'Canceled'; // Move to canceled
+                      order['status'] = 'Canceled';
                     });
                   },
                   style: ElevatedButton.styleFrom(
@@ -261,10 +265,8 @@ class _OrdersPageState extends State<OrdersPage> {
                 ),
               ],
             ),
-          if (_selectedTab == 'Completed')
-            const SizedBox.shrink(), // No button for completed
-          if (_selectedTab == 'Canceled')
-            const SizedBox.shrink(), // No button for canceled
+          if (_selectedTab == 'Completed') const SizedBox.shrink(),
+          if (_selectedTab == 'Canceled') const SizedBox.shrink(),
         ],
       ),
     );

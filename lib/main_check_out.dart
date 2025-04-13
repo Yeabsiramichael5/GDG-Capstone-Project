@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'main_order.dart'; // Navigation to orders
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -25,6 +26,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String deliveryTime = '6:00 pm, Wednesday 20';
   final TextEditingController locationController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
+
+  int itemCount = 3;
+  double subtotal = 423.0;
+  double discount = 4.0;
+  double deliveryCharge = 2.0;
+
+  double get total => subtotal - discount + deliveryCharge;
 
   @override
   Widget build(BuildContext context) {
@@ -140,15 +148,28 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                         ),
                         SizedBox(height: 10),
-                        _orderSummaryRow('Items', '3'),
+                        _orderSummaryRow('Items', '$itemCount'),
                         SizedBox(height: 4),
-                        _orderSummaryRow('Subtotal', '\$423'),
+                        _orderSummaryRow(
+                          'Subtotal',
+                          '\$${subtotal.toStringAsFixed(2)}',
+                        ),
                         SizedBox(height: 4),
-                        _orderSummaryRow('Discount', '-\$4'),
+                        _orderSummaryRow(
+                          'Discount',
+                          '-\$${discount.toStringAsFixed(2)}',
+                        ),
                         SizedBox(height: 4),
-                        _orderSummaryRow('Delivery Charges', '\$2'),
+                        _orderSummaryRow(
+                          'Delivery Charges',
+                          '\$${deliveryCharge.toStringAsFixed(2)}',
+                        ),
                         Divider(),
-                        _orderSummaryRow('Total', '\$423', isTotal: true),
+                        _orderSummaryRow(
+                          'Total',
+                          '\$${total.toStringAsFixed(2)}',
+                          isTotal: true,
+                        ),
                       ],
                     ),
                   ),
@@ -183,20 +204,24 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        print("Proceeding with checkout...");
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const OrdersPage()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: customBlue,
+                        backgroundColor: const Color(0xFF004AAD),
+                        minimumSize: const Size(double.infinity, 50),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 16),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Check Out',
                         style: TextStyle(
-                          color: Colors.white,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     ),
