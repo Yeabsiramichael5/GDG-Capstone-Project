@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main_order.dart'; // Navigation to orders
+import 'main_order.dart';
 
 void main() => runApp(const MyApp());
 
@@ -27,12 +27,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
 
-  int itemCount = 3;
-  double subtotal = 423.0;
+  int itemCount = 0;
+  double subtotal = 0.0;
   double discount = 4.0;
   double deliveryCharge = 2.0;
+  List<Map<String, dynamic>> orders = [];
 
   double get total => subtotal - discount + deliveryCharge;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final arguments =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    if (arguments != null) {
+      subtotal = arguments['subtotal'] ?? 0.0;
+      itemCount = arguments['itemCount'] ?? 0;
+      orders = arguments['orders'] ?? [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +220,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const OrdersPage()),
+                          MaterialPageRoute(
+                            builder: (_) => const OrdersPage(),
+                            settings: RouteSettings(
+                              arguments: {'orders': orders},
+                            ),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -293,15 +312,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(locationController.text);
-              },
+              onPressed:
+                  () => Navigator.of(context).pop(locationController.text),
               child: Text('Done'),
             ),
           ],
@@ -323,15 +339,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(timeController.text);
-              },
+              onPressed: () => Navigator.of(context).pop(timeController.text),
               child: Text('Done'),
             ),
           ],
@@ -361,18 +373,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                setState(() {
-                  selectedPaymentMethod = method;
-                });
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text('Confirm'),
             ),
           ],
@@ -411,15 +416,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text('Done'),
             ),
           ],
@@ -449,15 +450,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text('Confirm'),
             ),
           ],

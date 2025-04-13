@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main_cart.dart'; // Added for navigation back to Cart
+import 'main_cart.dart';
 
 void main() => runApp(const MyApp());
 
@@ -20,31 +20,21 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
-  final List<Map<String, dynamic>> orders = [
-    {
-      'title': 'Watch',
-      'brand': 'Rolex',
-      'price': '\$40',
-      'image': 'assets/Watch.png',
-      'status': 'Active',
-    },
-    {
-      'title': 'Airpods',
-      'brand': 'Apple',
-      'price': '\$333',
-      'image': 'assets/Airpods.png',
-      'status': 'Active',
-    },
-    {
-      'title': 'Hoodie',
-      'brand': 'Puma',
-      'price': '\$50',
-      'image': 'assets/Hoodie.png',
-      'status': 'Completed',
-    },
-  ];
+  List<Map<String, dynamic>> orders = [];
 
   String _selectedTab = 'Active';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final arguments =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    if (arguments != null && arguments.containsKey('orders')) {
+      final incomingOrders = arguments['orders'] as List<Map<String, dynamic>>;
+      orders = [...orders, ...incomingOrders];
+    }
+  }
 
   List<Map<String, dynamic>> getFilteredOrders(String status) {
     return orders.where((order) => order['status'] == status).toList();
@@ -76,7 +66,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => const CartScreen(),
-                                ), // NEW
+                                ),
                               ),
                           child: Container(
                             padding: const EdgeInsets.all(6),
@@ -182,12 +172,20 @@ class _OrdersPageState extends State<OrdersPage> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
-              order['image']!,
-              width: 75,
-              height: 75,
-              fit: BoxFit.cover,
-            ),
+            child:
+                order['image'] != null && order['image'].startsWith('http')
+                    ? Image.network(
+                      order['image'],
+                      width: 75,
+                      height: 75,
+                      fit: BoxFit.cover,
+                    )
+                    : Image.asset(
+                      order['image'] ?? 'assets/default.png',
+                      width: 75,
+                      height: 75,
+                      fit: BoxFit.cover,
+                    ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -196,7 +194,7 @@ class _OrdersPageState extends State<OrdersPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  order['title']!,
+                  order['title'] ?? '',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -204,12 +202,12 @@ class _OrdersPageState extends State<OrdersPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  order['brand']!,
+                  order['brand'] ?? '',
                   style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  order['price']!,
+                  '\$${order['price'] ?? '0'}',
                   style: const TextStyle(
                     color: Colors.deepPurple,
                     fontWeight: FontWeight.bold,
@@ -246,7 +244,7 @@ class _OrdersPageState extends State<OrdersPage> {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    // Track order action can go here
+                    // Track logic placeholder
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6C63FF),
@@ -265,8 +263,6 @@ class _OrdersPageState extends State<OrdersPage> {
                 ),
               ],
             ),
-          if (_selectedTab == 'Completed') const SizedBox.shrink(),
-          if (_selectedTab == 'Canceled') const SizedBox.shrink(),
         ],
       ),
     );

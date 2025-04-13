@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'main_check_out.dart'; // Added for navigation
+import 'models/product.dart';
+import 'services/api_service.dart';
+import 'main_check_out.dart';
+import 'main_order.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,7 +10,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,24 +21,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class CartItem {
-  final String id;
-  final String title;
-  final String brand;
-  final double price;
-  final String imageAsset;
-  int quantity;
-
-  CartItem({
-    required this.id,
-    required this.title,
-    required this.brand,
-    required this.price,
-    required this.imageAsset,
-    this.quantity = 1,
-  });
-}
-
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
@@ -45,69 +29,12 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  List<CartItem> _cartItems = [];
+  List<Product> _products = [];
+  final ApiService _apiService = ApiService();
   bool _isLoading = true;
 
-  Future<void> fetchCartItems() async {
-    await Future.delayed(const Duration(seconds: 1));
-    _cartItems = [
-      CartItem(
-        id: '1',
-        title: 'Watch',
-        brand: 'Rolex',
-        price: 40.0,
-        imageAsset: 'assets/Watch.png',
-        quantity: 2,
-      ),
-      CartItem(
-        id: '2',
-        title: 'Airpods',
-        brand: 'Apple',
-        price: 30.0,
-        imageAsset: 'assets/Airpods.png',
-        quantity: 2,
-      ),
-      CartItem(
-        id: '3',
-        title: 'Hoodie',
-        brand: 'Puma',
-        price: 50.0,
-        imageAsset: 'assets/Hoodie.png',
-        quantity: 2,
-      ),
-    ];
-  }
-
-  void _incrementQuantity(int index) {
-    setState(() {
-      _cartItems[index].quantity++;
-    });
-  }
-
-  void _decrementQuantity(int index) {
-    setState(() {
-      if (_cartItems[index].quantity > 1) {
-        _cartItems[index].quantity--;
-      }
-    });
-  }
-
-  void _removeItem(int index) {
-    setState(() {
-      _cartItems.removeAt(index);
-    });
-  }
-
-  double get _subtotal {
-    return _cartItems.fold(
-      0.0,
-      (sum, item) => sum + (item.price * item.quantity),
-    );
-  }
-
-  double get _discount => 4.0;
-  double get _deliveryCharge => 2.0;
-  double get _total => _subtotal - _discount + _deliveryCharge;
+  final Map<int, int> _quantities = {};
+  final Color darkBlue = const Color(0xFF004AAD);
 
   @override
   void initState() {
@@ -116,30 +43,79 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> _initializeData() async {
-    await fetchCartItems();
+    try {
+      _products = await _apiService.fetchProducts();
+      for (var product in _products) {
+        _quantities[product.id] = 1;
+      }
+    } catch (e) {
+      print('Failed to fetch products: $e');
+    }
     setState(() {
       _isLoading = false;
     });
   }
 
-  final Color darkBlue = const Color(0xFF004AAD);
+  void _incrementQuantity(int productId) {
+    setState(() {
+      _quantities[productId] = (_quantities[productId] ?? 1) + 1;
+    });
+  }
+
+  void _decrementQuantity(int productId) {
+    setState(() {
+      if ((_quantities[productId] ?? 1) > 1) {
+        _quantities[productId] = (_quantities[productId] ?? 1) - 1;
+      }
+    });
+  }
+
+  void _removeItem(int productId) {
+    setState(() {
+      _products.removeWhere((p) => p.id == productId);
+      _quantities.remove(productId);
+    });
+  }
+
+  double get _subtotal {
+    return _products.fold(
+      0.0,
+      (sum, item) => sum + (item.price * (_quantities[item.id] ?? 1)),
+    );
+  }
+
+  int get _itemCount {
+    return _quantities.values.fold(0, (sum, q) => sum + q);
+  }
+
+  double get _discount => 4.0;
+  double get _deliveryCharge => 2.0;
+  double get _total => _subtotal - _discount + _deliveryCharge;
+
+  List<Map<String, dynamic>> _generateOrderData() {
+    return _products.map((product) {
+      return {
+        'title': product.title,
+        'brand': 'Brand',
+        'price': product.price,
+        'image': product.image,
+        'status': 'Active',
+      };
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Cart',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Cart',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        ),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.black),
@@ -173,131 +149,121 @@ class _CartScreenState extends State<CartScreen> {
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : LayoutBuilder(
-                builder: (context, constraints) {
-                  final isWide = constraints.maxWidth > 600;
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: _cartItems.length,
-                          itemBuilder: (context, index) {
-                            final item = _cartItems[index];
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 16.0),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
+              : SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _products.length,
+                      itemBuilder: (context, index) {
+                        final item = _products[index];
+                        final quantity = _quantities[item.id] ?? 1;
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 16.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.network(
+                                    item.image,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.title,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '\$${item.price.toStringAsFixed(2)}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleSmall
+                                            ?.copyWith(color: Colors.blueGrey),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Image.asset(
-                                        item.imageAsset,
-                                        width: isWide ? 100 : 60,
-                                        height: isWide ? 100 : 60,
-                                        fit: BoxFit.cover,
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: darkBlue,
+                                        shape: BoxShape.circle,
                                       ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            item.title,
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleMedium?.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            item.brand,
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.bodyMedium?.copyWith(
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            '\$${item.price.toStringAsFixed(2)}',
-                                            style: Theme.of(
-                                              context,
-                                            ).textTheme.titleSmall?.copyWith(
-                                              color: Colors.blueGrey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: darkBlue,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: IconButton(
-                                            onPressed:
-                                                () => _decrementQuantity(index),
-                                            icon: const Icon(
-                                              Icons.remove,
-                                              color: Colors.white,
-                                            ),
-                                            splashRadius: 20,
-                                          ),
+                                      child: IconButton(
+                                        onPressed:
+                                            () => _decrementQuantity(item.id),
+                                        icon: const Icon(
+                                          Icons.remove,
+                                          color: Colors.white,
                                         ),
-                                        const SizedBox(width: 8),
-                                        Text('${item.quantity}'),
-                                        const SizedBox(width: 8),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: darkBlue,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: IconButton(
-                                            onPressed:
-                                                () => _incrementQuantity(index),
-                                            icon: const Icon(
-                                              Icons.add,
-                                              color: Colors.white,
-                                            ),
-                                            splashRadius: 20,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(width: 12),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.delete_outline,
-                                        color: Colors.red,
+                                        splashRadius: 20,
                                       ),
-                                      onPressed: () => _removeItem(index),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text('$quantity'),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: darkBlue,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: IconButton(
+                                        onPressed:
+                                            () => _incrementQuantity(item.id),
+                                        icon: const Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                        ),
+                                        splashRadius: 20,
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                        _buildOrderSummarySection(context, isWide),
-                      ],
+                                const SizedBox(width: 12),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () => _removeItem(item.id),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+                    const SizedBox(height: 24),
+                    _buildOrderSummarySection(context),
+                  ],
+                ),
               ),
     );
   }
 
-  Widget _buildOrderSummarySection(BuildContext context, bool isWide) {
+  Widget _buildOrderSummarySection(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 16.0),
       child: Padding(
@@ -313,7 +279,7 @@ class _CartScreenState extends State<CartScreen> {
             const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [const Text('Items'), Text('${_cartItems.length}')],
+              children: [const Text('Items'), Text('$_itemCount')],
             ),
             const SizedBox(height: 4),
             Row(
@@ -359,11 +325,20 @@ class _CartScreenState extends State<CartScreen> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
+                final orders = _generateOrderData();
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => const CheckoutPage(),
-                  ), // NEW
+                    settings: RouteSettings(
+                      arguments: {
+                        'subtotal': _subtotal,
+                        'itemCount': _itemCount,
+                        'orders': orders,
+                      },
+                    ),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
