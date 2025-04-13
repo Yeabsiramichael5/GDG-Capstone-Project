@@ -65,6 +65,9 @@ flutter:
      - assets/Hoodie.png
      - assets/Watch.png
      - assets/profile.jpg
+     - assets/Jacket.jpg
+     - assets/Tshirt.png
+     - assets/Sneakers.jpg
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

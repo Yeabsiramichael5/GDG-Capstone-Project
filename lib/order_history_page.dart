@@ -8,11 +8,18 @@ class OrderHistoryPage extends StatefulWidget {
 }
 
 class _OrderHistoryPageState extends State<OrderHistoryPage> {
-  int selectedTab = 0; // 0 = Active, 1 = Completed, 2 = Cancel
+  int selectedTab = 0;
+
   List<Map<String, dynamic>> activeOrders = [
     {"title": "Watch", "brand": "Rolex", "price": "\$40", "image": "assets/Watch.png"},
     {"title": "Airpods", "brand": "Apple", "price": "\$333", "image": "assets/Airpods.png"},
     {"title": "Hoodie", "brand": "Puma", "price": "\$50", "image": "assets/Hoodie.png"},
+  ];
+
+  final List<Map<String, dynamic>> completedOrders = [
+    {"title": "Jacket", "brand": "Nike", "price": "\$70", "image": "assets/Jacket.jpg"},
+    {"title": "T-Shirt", "brand": "Adidas", "price": "\$25", "image": "assets/Tshirt.png"},
+    {"title": "Sneakers", "brand": "New Balance", "price": "\$90", "image": "assets/Sneakers.jpg"},
   ];
 
   void cancelOrder(int index) {
@@ -21,8 +28,32 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     });
   }
 
+  void trackOrder(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Your order is on the way!"),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> getCurrentTabItems() {
+    switch (selectedTab) {
+      case 0:
+        return activeOrders;
+      case 1:
+        return completedOrders;
+      case 2:
+        return activeOrders;
+      default:
+        return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> orders = getCurrentTabItems();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Orders", style: TextStyle(color: Colors.black)),
@@ -45,47 +76,51 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: activeOrders.length,
-              itemBuilder: (context, index) {
-                final order = activeOrders[index];
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Image.asset(order["image"], width: 70, height: 70, fit: BoxFit.cover),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+            child: orders.isEmpty
+                ? const Center(child: Text("No items in this section"))
+                : ListView.builder(
+                    itemCount: orders.length,
+                    itemBuilder: (context, index) {
+                      final order = orders[index];
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
                           children: [
-                            Text(order["title"], style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                            Text(order["brand"]),
-                            Text(order["price"], style: const TextStyle(color: Colors.blue)),
+                            Image.asset(order["image"], width: 70, height: 70, fit: BoxFit.cover),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(order["title"],
+                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                  Text(order["brand"]),
+                                  Text(order["price"], style: const TextStyle(color: Colors.blue)),
+                                ],
+                              ),
+                            ),
+                            if (selectedTab == 0)
+                              ElevatedButton(
+                                onPressed: () => trackOrder(context),
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
+                                child: const Text("Track Order"),
+                              )
+                            else if (selectedTab == 2)
+                              ElevatedButton(
+                                onPressed: () => cancelOrder(index),
+                                style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                                child: const Text("Cancel"),
+                              ),
                           ],
                         ),
-                      ),
-                      selectedTab == 2
-                          ? ElevatedButton(
-                              onPressed: () => cancelOrder(index),
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-                              child: const Text("Cancel"),
-                            )
-                          : ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple),
-                              child: const Text("Track Order"),
-                            ),
-                    ],
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           )
         ],
       ),

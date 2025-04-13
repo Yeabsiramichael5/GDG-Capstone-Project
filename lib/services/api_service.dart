@@ -2,25 +2,23 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'https://fakestoreapi.com';
+  static const String baseUrl = 'https://fakestoreapi.com';
 
-  // Fetch user profile from FakeStore API
-  Future<Map<String, dynamic>> fetchProfile() async {
-    final url = Uri.parse('$baseUrl/users/1');
-    final response = await http.get(url);
+  // Fetch user profile
+  Future<Map<String, dynamic>> fetchProfile({int userId = 1}) async {
+    final response = await http.get(Uri.parse('$baseUrl/users/$userId'));
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return json.decode(response.body);
     } else {
-      throw Exception('Failed to load profile');
+      throw Exception('Failed to load user profile');
     }
   }
 
-  // Optional: update profile
-  Future<void> updateProfile(Map<String, dynamic> updatedData) async {
-    final url = Uri.parse('$baseUrl/users/1');
+  // Update user profile
+  Future<void> updateProfile(int userId, Map<String, dynamic> updatedData) async {
     final response = await http.put(
-      url,
+      Uri.parse('$baseUrl/users/$userId'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(updatedData),
     );
