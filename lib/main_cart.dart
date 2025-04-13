@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'models/product.dart';
 import 'services/api_service.dart';
 import 'main_check_out.dart';
-import 'main_order.dart';
 
 void main() {
   runApp(const MyApp());
@@ -120,24 +119,15 @@ class _CartScreenState extends State<CartScreen> {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.black),
             onSelected: (value) {
-              if (value == 'Settings') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const SettingsPage()),
-                );
-              } else if (value == 'Help') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HelpPage()),
+              if (value == 'Help') {
+                showDialog(
+                  context: context,
+                  builder: (_) => const Dialog(child: HelpPage()),
                 );
               }
             },
             itemBuilder:
                 (BuildContext context) => [
-                  const PopupMenuItem<String>(
-                    value: 'Settings',
-                    child: Text('Settings'),
-                  ),
                   const PopupMenuItem<String>(
                     value: 'Help',
                     child: Text('Help'),
@@ -326,7 +316,6 @@ class _CartScreenState extends State<CartScreen> {
             ElevatedButton(
               onPressed: () {
                 final orders = _generateOrderData();
-
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -364,24 +353,95 @@ class _CartScreenState extends State<CartScreen> {
   }
 }
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+// Help Page
+class HelpPage extends StatelessWidget {
+  const HelpPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Settings")),
-      body: const Center(child: Text("Settings Page")),
+      appBar: AppBar(title: const Text("Help Center")),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const Text(
+              "How can we help you?",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              "If you need any help, contact us",
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 30),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                children: const [
+                  _HelpCard(
+                    icon: Icons.location_on,
+                    title: "OUR MAIN OFFICE",
+                    info: "AASTU, Kilinto Prison kef blo",
+                  ),
+                  _HelpCard(
+                    icon: Icons.phone,
+                    title: "PHONE",
+                    info: "0912345678\n0987654321",
+                  ),
+                  _HelpCard(
+                    icon: Icons.print,
+                    title: "FAX",
+                    info: "12345678900",
+                  ),
+                  _HelpCard(
+                    icon: Icons.email,
+                    title: "EMAIL",
+                    info: "ethioshopping@gmail.com",
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class HelpPage extends StatelessWidget {
-  const HelpPage({super.key});
+class _HelpCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String info;
+
+  const _HelpCard({
+    required this.icon,
+    required this.title,
+    required this.info,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Help")),
-      body: const Center(child: Text("Help Page")),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 30, color: Colors.deepPurple),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 6),
+            Text(info, textAlign: TextAlign.center),
+          ],
+        ),
+      ),
     );
   }
 }
