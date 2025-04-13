@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "446861035427",
+    "project_id": "ecommerce-capstone-807ce",
+    "storage_bucket": "ecommerce-capstone-807ce.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446861035427:android:040e446e93f95705443c16",
+        "android_client_info": {
+          "package_name": "com.example.e_commerce_clothing_store"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfD7s9J7W4l8aMG1OUC3vRcxRWDfSFK1w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
