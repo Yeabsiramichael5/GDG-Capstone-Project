@@ -1,13 +1,45 @@
 import 'package:flutter/material.dart';
-import 'profile';
+import '../services/api_service.dart';
+import 'edit_profile_page.dart';
 import 'settings_page.dart';
 import 'contact_page.dart';
 import 'help_page.dart';
 import 'share_app_page.dart';
+import 'order_history_page.dart';
 
-
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final ApiService _apiService = ApiService();
+
+  String firstName = '';
+  String lastName = '';
+  String email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  void _loadProfile() async {
+    try {
+      final profile = await _apiService.fetchProfile();
+      setState(() {
+        firstName = profile['name']['firstname'] ?? '';
+        lastName = profile['name']['lastname'] ?? '';
+        email = profile['email'] ?? '';
+      });
+    } catch (e) {
+      // handle error gracefully
+      debugPrint('Error fetching profile: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +50,12 @@ class ProfilePage extends StatelessWidget {
         selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,
         onTap: (index) {
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const OrderHistoryPage()),
+            );
+          }
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
@@ -32,35 +70,34 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Profile Image
               Center(
                 child: CircleAvatar(
                   radius: 50,
-                  backgroundImage: AssetImage("assets/profile.jpg"),
+                  backgroundImage: AssetImage("assets/images/profile.jpg"),
                 ),
               ),
               const SizedBox(height: 16),
-              const Center(
+              Center(
                 child: Text(
-                  "Mark Adam",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  "$firstName $lastName",
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 4),
-              const Center(
+              Center(
                 child: Text(
-                  "Sunny_Koelpin45@hotmail.com",
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  email,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ),
               const SizedBox(height: 30),
 
               // Menu Items
-              buildMenuItem(Icons.person, "Profile", () {
+              buildMenuItem(Icons.person, "Edit Profile", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Profile()),
-                );
+                  MaterialPageRoute(builder: (context) => const EditProfilePage()),
+                ).then((_) => _loadProfile()); // reload on return
               }),
               buildMenuItem(Icons.settings, "Setting", () {
                 Navigator.push(
@@ -100,7 +137,10 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // Sign out logic goes here
+                    // Sign out logic
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Signed Out")),
+                    );
                   },
                   child: const Text(
                     "Sign Out",

@@ -1,32 +1,32 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../models/user.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://fakestoreapi.com';
+  final String baseUrl = 'https://fakestoreapi.com';
 
-  // Get user by ID
-  Future<User> getUser(int id) async {
-    final response = await http.get(Uri.parse('$baseUrl/users/$id'));
+  // Fetch user profile from FakeStore API
+  Future<Map<String, dynamic>> fetchProfile() async {
+    final url = Uri.parse('$baseUrl/users/1');
+    final response = await http.get(url);
+
     if (response.statusCode == 200) {
-      return User.fromJson(json.decode(response.body));
+      return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to load user');
+      throw Exception('Failed to load profile');
     }
   }
 
-  // Update user profile
-  Future<User> updateUser(int id, Map<String, dynamic> updatedData) async {
+  // Optional: update profile
+  Future<void> updateProfile(Map<String, dynamic> updatedData) async {
+    final url = Uri.parse('$baseUrl/users/1');
     final response = await http.put(
-      Uri.parse('$baseUrl/users/$id'),
+      url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode(updatedData),
+      body: jsonEncode(updatedData),
     );
 
-    if (response.statusCode == 200) {
-      return User.fromJson(json.decode(response.body));
-    } else {
-      throw Exception('Failed to update user');
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update profile');
     }
   }
 }
