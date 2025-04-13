@@ -118,7 +118,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     icon: const Icon(Icons.lock, color: Colors.white),
                     label: const Text(
-                      "Change Password",
+                      "Update Profile",
                       style: TextStyle(color: Colors.white),
                     ),
                     onPressed: () {
