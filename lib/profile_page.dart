@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'profile';
-import 'profile.dart';
 import 'settings_page.dart';
 import 'contact_page.dart';
 import 'help_page.dart';
