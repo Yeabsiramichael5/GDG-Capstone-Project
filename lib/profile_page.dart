@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'settings_page.dart'; // Make sure this file exists
+import 'package:profile_page/profile';
+import 'settings_page.dart';
+import 'contact_page.dart';
+import 'help_page.dart';
+import 'share_app_page.dart';
+
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -12,6 +17,8 @@ class ProfilePage extends StatelessWidget {
         currentIndex: 3,
         selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,
+        onTap: (index) {
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: ''),
@@ -48,9 +55,12 @@ class ProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // Menu Items with Buttons
+              // Menu Items
               buildMenuItem(Icons.person, "Profile", () {
-                // Do something on Profile
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Profile()),
+                );
               }),
               buildMenuItem(Icons.settings, "Setting", () {
                 Navigator.push(
@@ -59,13 +69,22 @@ class ProfilePage extends StatelessWidget {
                 );
               }),
               buildMenuItem(Icons.mail, "Contact", () {
-                // Do something on Contact
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ContactPage()),
+                );
               }),
               buildMenuItem(Icons.share, "Share App", () {
-                // Do something on Share
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ShareAppPage()),
+                );
               }),
               buildMenuItem(Icons.help_outline, "Help", () {
-                // Do something on Help
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HelpPage()),
+                );
               }),
 
               const SizedBox(height: 30),
@@ -81,7 +100,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // Handle sign out
+                    // Sign out logic goes here
                   },
                   child: const Text(
                     "Sign Out",
