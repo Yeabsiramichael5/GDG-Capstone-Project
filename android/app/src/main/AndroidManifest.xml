@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
+<<<<<<< HEAD
         android:label="profile_page"
+=======
+        android:label="capstone"
+>>>>>>> 9ae0de3467d6653b1af369d4e57d0b779b5b4943
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

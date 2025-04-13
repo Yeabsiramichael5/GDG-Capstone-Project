@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
     "name": "profile_page",
     "short_name": "profile_page",
+=======
+    "name": "capstone",
+    "short_name": "capstone",
+>>>>>>> 9ae0de3467d6653b1af369d4e57d0b779b5b4943
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

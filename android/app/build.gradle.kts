@@ -6,7 +6,11 @@ plugins {
 }
 
 android {
+<<<<<<< HEAD
     namespace = "com.example.profile_page"
+=======
+    namespace = "com.example.capstone"
+>>>>>>> 9ae0de3467d6653b1af369d4e57d0b779b5b4943
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +25,11 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+<<<<<<< HEAD
         applicationId = "com.example.profile_page"
+=======
+        applicationId = "com.example.capstone"
+>>>>>>> 9ae0de3467d6653b1af369d4e57d0b779b5b4943
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

@@ -1,4 +1,4 @@
-# profile_page
+# capstone
 
 A new Flutter project.
 
