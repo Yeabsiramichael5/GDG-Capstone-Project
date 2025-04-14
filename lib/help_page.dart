@@ -25,10 +25,10 @@ class HelpPage extends StatelessWidget {
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
                 children: const [
-                  _HelpCard(icon: Icons.location_on, title: "OUR MAIN OFFICE", info: "AASTU, Kilinto Prison kef blo"),
+                  _HelpCard(icon: Icons.location_on, title: "OUR MAIN OFFICE", info: "AASTU, Tulu Dimtu Campus\nAddis Ababa, Ethiopia"),
                   _HelpCard(icon: Icons.phone, title: "PHONE", info: "0912345678\n0987654321"),
                   _HelpCard(icon: Icons.print, title: "FAX", info: "12345678900"),
-                  _HelpCard(icon: Icons.email, title: "EMAIL", info: "DefNotAddingMyEmailHere@gmail.com"),
+                  _HelpCard(icon: Icons.email, title: "EMAIL", info: "abcdef@gmail.com"),
                 ],
               ),
             )

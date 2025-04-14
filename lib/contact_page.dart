@@ -50,7 +50,7 @@ class ContactPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: const [
-                _ContactInfo(icon: Icons.directions_run, title: "Abou App", subtitle: "Shopping App\nLast Group"),
+                _ContactInfo(icon: Icons.directions_run, title: "About App", subtitle: "Shopping App\nLast Group"),
                 _ContactInfo(icon: Icons.phone, title: "PHONE", subtitle: "0912345678\n0987654321"),
                 _ContactInfo(icon: Icons.location_on, title: "LOCATION", subtitle: "AASTU,\nAddis Ababa, Ethiopia"),
               ],
