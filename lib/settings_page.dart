@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'profile';
-import 'profile.dart';
 import 'notification_page.dart';
 import 'language_page.dart';
 import 'privacy_page.dart';

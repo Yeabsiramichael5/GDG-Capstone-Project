@@ -6,8 +6,7 @@ import 'contact_page.dart';
 import 'help_page.dart';
 import 'share_app_page.dart';
 import 'order_history_page.dart';
-import 'package:e_commerce_clothing_store/views/home/login_screen.dart';
-
+// import 'package:e_commerce_clothing_store/views/home/login_screen.dart'; // Commented out
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -124,11 +123,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (route) => false,
-                    );
+                    // Navigator.pushAndRemoveUntil(
+                    //   context,
+                    //   MaterialPageRoute(builder: (_) => const LoginScreen()), // Commented out
+                    //   (route) => false,
+                    // );
                   },
                   child: const Text("Sign Out", style: TextStyle(color: Colors.white)),
                 ),
