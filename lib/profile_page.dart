@@ -4,9 +4,9 @@ import '../services/api_service.dart';
 import 'settings_page.dart';
 import 'contact_page.dart';
 import 'help_page.dart';
-
 import 'share_app_page.dart';
 import 'order_history_page.dart';
+import 'login_screen.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -30,7 +30,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadUserProfile() async {
     try {
-      // Pass the userId correctly as a positional parameter
       final profile = await _apiService.fetchProfile(userId);
       setState(() {
         firstName = profile['name']['firstname'] ?? '';
@@ -99,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   context,
                   MaterialPageRoute(builder: (context) => const EditProfilePage()),
                 );
-                _loadUserProfile(); // Reload when returning
+                _loadUserProfile();
               }),
               buildMenuItem(Icons.settings, "Setting", () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
@@ -114,6 +113,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpPage()));
               }),
               const SizedBox(height: 30),
+
+              // Sign Out Button
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -122,9 +123,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () {
-                    // sign out logic
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Signed Out")),
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      (route) => false,
                     );
                   },
                   child: const Text("Sign Out", style: TextStyle(color: Colors.white)),
